@@ -1,0 +1,59 @@
+---
+strategy: polling
+no_screen_padding: 'yes'
+dark_mode: 'no'
+static_data: ''
+polling_verb: get
+framework_version: 3.2.0
+serverless_language: ''
+polling_url: https://trmnl-weather-api.vercel.app/api/weather-proxy?type=mood&latitude={{ trmnl.plugin_settings.custom_fields_values.latitude }}&longitude={{ trmnl.plugin_settings.custom_fields_values.longitude }}&temperature_unit={{ trmnl.plugin_settings.custom_fields_values.temperature_unit }}
+polling_headers: ''
+polling_body: ''
+id: 305453
+oauth_enabled: 'false'
+oauth_pkce_enabled: 'no'
+oauth_authorize_url: ''
+oauth_token_url: ''
+oauth_scopes: ''
+oauth_scope_separator: ''
+oauth_refresh_url: ''
+oauth_auth_params: ''
+oauth_token_headers: ''
+oauth_token_site: ''
+oauth_token_params: ''
+oauth_token_request_auth_method: ''
+oauth_body_format: ''
+oauth_token_response_metadata: ''
+oauth_authorization_method: ''
+oauth_refresh_params: ''
+oauth_token_field_name: ''
+oauth_expiry_field_name: ''
+oauth_expiry_strategy: ''
+oauth_fixed_expiry_ms: ''
+custom_fields:
+- name: About this plugin
+  keyname: author_bio
+  field_type: author_bio
+  description: Just a simple weather dashboard, that may or may not call you names. Powered by Open-Meteo API.
+  email_address: trmnl@achtnegen.nl
+  category: entertainment
+- keyname: latitude
+  name: Latitude
+  field_type: string
+  default: ''
+  help_text: Use <a href="https://www.gps-coordinates.net/" target="_blank">GPS Coordinates website</a> to find your Latitude
+- keyname: longitude
+  name: Longitude
+  field_type: string
+  default: ''
+  help_text: Use <a href="https://www.gps-coordinates.net/" target="_blank">GPS Coordinates website</a> to find your Longitude
+- keyname: temperature_unit
+  name: Temperature Unit
+  field_type: select
+  default: celsius
+  options:
+  - Celsius (°C): celsius
+  - Fahrenheit (°F): fahrenheit
+name: Blunt Weather
+description: Don't f*ck with the weather
+refresh_interval: 15

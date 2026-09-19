@@ -1,0 +1,31 @@
+{% if error %}
+<div class="layout p--5 flex flex--col flex--left">
+  <div class="text text--mega lg:text--giga text--bold">No weather data.</div>
+  <div class="text text--large lg:text--xlarge mt--4">It's all your fault, but we'll fix it.</div>
+</div>
+{% else %}
+<div class="layout p--4 lg:p--10 layout--col flex--left gap--large">
+  <div class="stretch flex flex--col flex--left border--h-6 pb--6">
+    <div>
+      <img src="https://trmnl.achtnegen.nl/weather/icons/{{ weather_category }}.svg" class="w--20 lg:hidden">
+      <img src="https://trmnl.achtnegen.nl/weather/icons/{{ weather_category }}.svg" class="w--32 lg:block md:hidden mb--10">
+    </div>
+    <div class="mood text text--mega lg:text--giga text--bold lg:pr--16">
+      {{ mood_line }}
+    </div>
+    <div class="text text--large lg:text--xlarge stretch flex gap--xsmall flex--end">
+      {% if rain_incoming %}
+      {{ rain_line }}
+      {% endif %}
+    </div>
+  </div>
+  <div class="text text--base lg:text--large flex flex--row flex--between w--full">
+    <div>
+      It's now <strong>{{ temperature }}{{ unit }}</strong>, but it feels like <strong>{{ apparent_temperature }}{{ unit }}</strong>
+    </div>
+    <div class="flex gap--large">
+      <span>↑ {{ sunrise_fmt }}</span><span>↓ {{ sunset_fmt }}</span>
+    </div>
+  </div>
+</div>
+{% endif %}

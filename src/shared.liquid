@@ -1,0 +1,110 @@
+{%- comment -%} === DATA === {%- endcomment -%}
+{% assign temperature          = temperature | round %}
+{% assign apparent_temperature = apparent_temperature | round %}
+{% assign weather_code         = weather_code %}
+{% assign precipitation_chance = precipitation_probability %}
+{% assign unit                 = unit | default: "°C" %}
+
+{%- comment -%} === TIJD (voor random index) === {%- endcomment -%}
+
+{% assign utc            = trmnl.system.timestamp_utc %}
+{% assign offset         = trmnl.user.utc_offset %}
+{% assign local_ts       = utc | plus: offset %}
+{% assign current_minute = local_ts | date: "%M" | plus: 0 %}
+
+{%- comment -%} === SUNRISE / SUNSET FORMATTING === {%- endcomment -%}
+
+{% assign sunrise_fmt = sunrise | date: "%H:%M" %}
+{% assign sunset_fmt  = sunset  | date: "%H:%M" %}
+
+{%- comment -%} === WEER CATEGORIE === {%- endcomment -%}
+
+{% assign rain_incoming = false %}
+{% if precipitation_chance > 50 %}
+  {% assign rain_incoming = true %}
+{% endif %}
+
+{% assign weather_category = "" %}
+{% case weather_code %}
+  {% when 0, 1 %}
+    {% if rain_incoming %}
+      {% assign weather_category = "sunny_but" %}
+    {% else %}
+      {% assign weather_category = "sunny" %}
+    {% endif %}
+  {% when 2, 3 %}
+    {% if rain_incoming %}
+      {% assign weather_category = "cloudy_but" %}
+    {% else %}
+      {% assign weather_category = "cloudy" %}
+    {% endif %}
+  {% when 45, 48 %}
+    {% assign weather_category = "foggy" %}
+  {% when 51, 53, 55, 56, 57 %}
+    {% assign weather_category = "drizzle" %}
+  {% when 61, 63, 80, 81 %}
+    {% assign weather_category = "rain" %}
+  {% when 65, 82 %}
+    {% assign weather_category = "heavy_rain" %}
+  {% when 66, 67 %}
+    {% assign weather_category = "freezing_rain" %}
+  {% when 71, 73, 85 %}
+    {% assign weather_category = "snow" %}
+  {% when 75, 77, 86 %}
+    {% assign weather_category = "heavy_snow" %}
+  {% when 95, 96, 99 %}
+    {% assign weather_category = "storm" %}
+  {% else %}
+    {% assign weather_category = "cloudy" %}
+{% endcase %}
+
+{%- comment -%} === ZINNEN PER CATEGORIE === {%- endcomment -%}
+
+{%- comment -%} 10 zinnen per categorie, index 0-9 via minuut modulo 10 {%- endcomment -%}
+{% assign mood_index = current_minute | modulo: 10 %}
+
+{% if weather_category == "sunny" %}
+  {% assign lines = "<span>Sun's out</span>. Go outside, you pale bastard.|<span>Actual sunshine</span>. Seasonal depression can fuck right off.|<span>Clear skies</span>. No excuses today. None.|<span>Beautiful day</span>. Don't waste it being a disappointment.|The <span>sun is out</span>. Even you can't ruin this.|<span>Sunny as hell</span>. Get off the couch.|<span>Perfect weather</span>. Terrible person. Go outside.|<span>Gorgeous out</span>. Your plants are judging you.|<span>Blue skies</span>. Touch some grass. Literally.|<span>Sunshine</span>. The one good thing happening today.|<span>Bright and sunny</span>. You have no excuse today.|<span>Clear and warm</span>. Even the weather is trying harder than you.|<span>Sun's out</span>. Vitamin D is free. Take it." | split: "|" %}
+
+{% elsif weather_category == "sunny_but" %}
+  {% assign lines = "<span>Sun's out</span> but don't get attached.|<span>Nice now</span>. Wet later. You've been warned.|Looks <span>sunny</span>. It's lying to your face.|<span>Beautiful morning</span>. Rain has other plans for you.|The sky is <span>gaslighting</span> you today.|<span>Deceptively lovely</span> out there. Don't trust it.|<span>Sunshine</span>. Hope you burn.|<span>Sunny</span>. For now. Enjoy it while it lasts, idiot.|<span>Clear skies</span> with a side of incoming bullshit.|Gorgeous <span>weather</span>. Shit day. Pack accordingly.|<span>Sunny for now</span>. Nature's setting you up.|<span>Gorgeous skies</span>. Enjoy the lie while it lasts." | split: "|" %}
+
+{% elsif weather_category == "cloudy" %}
+  {% assign lines = "Just <span>clouds</span>. As fucking usual.|<span>Overcast</span>. Relatable, honestly.|The sky is <span>grey</span> just like your personality.|<span>Cloudy</span>. Nothing dramatic, nothing good.|<span>Grey skies</span>. Boring shit, just like you|The sky is <span>in a meeting</span>. Do not disturb.|<span>Clouds</span>. Cool. Whatever dipshit.|<span>Overcast</span>. Even the weather gave up on you today.|Just <span>grey</span>. Matching your entire personality.|<span>Cloudy</span>. At least it's not raining. Yet.|<span>Grey again</span>. Shocking. Truly shocking.|<span>Cloudy</span>. The sky's default setting. Like you." | split: "|" %}
+
+{% elsif weather_category == "cloudy_but" %}
+  {% assign lines = "<span>Grey skies</span> and bad vibes incoming.|<span>Cloudy</span> with a 100% chance of regret.|Those <span>clouds</span> are plotting something.|<span>Overcast</span> and preparing to fuck you up.|<span>Clouds</span>. They're warming up. Run.|Looks <span>fine</span>. Feels like a trap. It is.|<span>Grey</span> now, soaked later.|The <span>clouds</span> are not fucking around today.|<span>Cloudy</span>. Rain's is coming for you.|Low-key <span>ominous</span> out there. High-key true.|<span>Overcast</span> with malicious intent.|<span>Grey skies</span> loading something worse." | split: "|" %}
+
+{% elsif weather_category == "drizzle" %}
+  {% assign lines = "<span>Drizzling</span>. The coward's rain.|Too <span>wet</span> to ignore, oh yeah, single life.|<span>Drizzle</span>. Getting misted like a goddamn salad.|The sky is <span>spitting</span> on you. Personally.|<span>Light rain</span>. Your hair gets wet, if you have hair.|<span>Drizzle</span>, thats it, boring fuck.|The <span>mist</span> is here. So is the misery.|<span>Drizzling</span>. Nature's most passive aggressive move.|Barely <span>raining</span>. Still fucking up your day.|<span>Damp</span>. Just like a coffin, 3 feet below.|<span>Drizzle</span>. Wet enough to ruin, light enough to gaslight you.|Permanently <span>damp</span>. Welcome to your life old fuck." | split: "|" %}
+
+{% elsif weather_category == "rain" %}
+  {% assign lines = "It's <span>raining</span> men. They dead.|<span>Raining</span>. Your big toe gets wet too.|<span>Rain</span>. Nature cancelling your plans again.|It's <span>wet</span> and thats your fucking problem.|<span>Raining</span>. Love that for you.|<span>Rain</span>. The streets are clean. You won't be.|Classic <span>rain</span>.|<span>Raining</span>. Running for the bus in 3, 2, 1.|<span>Wet outside</span>. Stay in. Call it self care.|Weather status: <span>raining</span>. Mood status: done.|<span>Raining</span>. Hope you like wet socks.|<span>Rain</span>. It knows what it did." | split: "|" %}
+
+{% elsif weather_category == "heavy_rain" %}
+  {% assign lines = "<span>Pouring</span>. Just absolutely pouring.|<span>Heavy rain</span>. Cancel everything. Stay home.|You're getting <span>soaked</span> today. Accept your fate.|<span>Bucketing down</span>. This is not umbrella weather.|The <span>rain</span> is not messing around today.|<span>Pissing it down</span>, sad fuck.|<span>Heavy rain</span>. Raining like it has something to prove.|Going outside is a <span>terrible idea</span>. Just like you.|<span>Pouring rain</span>. Pouring wine, lets go crackhead.|The sky <span>opened up</span> and so is your mom.|<span>Torrential</span>. Genuinely biblical out there.|<span>Pouring</span>. Nature hates your schedule specifically." | split: "|" %}
+
+{% elsif weather_category == "freezing_rain" %}
+  {% assign lines = "<span>Freezing rain</span>. The most evil weather known to man.|Cold and <span>wet simultaneously</span>. Truly inspired cruelty.|<span>Ice rain</span>. Nature at its absolute pettiest.|<span>Freezing rain</span>. A personal attack from the atmosphere.|The <span>roads hate you</span> today. Walk carefully.|<span>Slippery, cold, wet</span>. What a fucking combo.|<span>Freezing rain</span>. Stay inside or suffer. Your call.|Hostile <span>precipitation</span> incoming. Good luck out there.|<span>Ice rain</span>. The universe saying no to your plans.|Cold water, <span>icy ground</span>. Absolute disaster waiting.|<span>Freezing rain</span>. Your commute is now a liability.|Everything outside is <span>a trap</span> right now.|<span>Ice rain</span>. Wear something you don't mind ruining." | split: "|" %}
+
+{% elsif weather_category == "foggy" %}
+  {% assign lines = "<span>Foggy</span>. Spooky. Carry on if you dare.|The world is <span>loading</span>. Please wait.|<span>Fog</span>. Can't see shit. Drive slow.|<span>Dense fog</span>. Great day to disappear.|<span>Foggy</span>. Visibility poor, poor like you.|The sky is being <span>dramatic</span> again. Classic.|<span>Fog</span> so thick, it could be you.|<span>Misty</span> and mysterious. Still have to go to work though.|<span>Foggy morning</span>. The world is hiding. Smart.|Can't see your <span>future</span>. Can't see the street either.|<span>Foggy</span>. The world is buffering.|<span>Thick fog</span>. Everything is vibes and nothing is visible." | split: "|" %}
+
+{% elsif weather_category == "snow" %}
+  {% assign lines = "<span>Snowing</span>. Beautiful until you have to drive.|It's <span>snowing</span>. The kids are thrilled. You're not.|<span>Snow</span>. Everything looks pretty, nothing works.|<span>Snowing</span> and someone will park like an idiot today.|White <span>stuff falling</span>, not cocaine.|<span>Snow day</span>. But get up and work.|<span>Snowing</span>. Shovel or suffer. Pick one.|Winter <span>arrived</span>. Adjust your entire life accordingly.|<span>Snow</span>. Looks nice, your not.|<span>Snowing</span>. Cold, wet, and coming for your commute.|<span>Snowing</span>. Pretty from inside. Hell from outside.|<span>Snow</span>. Nature's way of saying slow the fuck down." | split: "|" %}
+
+{% elsif weather_category == "heavy_snow" %}
+  {% assign lines = "<span>Heavy snow</span>. Stay inside. Not a suggestion.|Full <span>blizzard</span> energy out there. Absolutely not.|<span>Heavy snowfall</span>. Your plans are cancelled by nature.|Everything is <span>white and closed</span>. Make soup.|<span>Blizzard adjacent</span>. No thank you, hard pass.|<span>Heavy snow</span>. Road crews are doing their best. You stay home.|The <span>snow</span> is not fucking around today.|<span>Whiteout conditions</span>. Do not go outside. I mean it.|One big <span>snow globe</span> out there. Don't shake it.|<span>Heavy snow</span>. Cancel everything. Yes, everything.|<span>Blizzard</span>. The answer is no. Stay home.|<span>Heavy snow</span>. Nature overruled your calendar." | split: "|" %}
+
+{% elsif weather_category == "storm" %}
+  {% assign lines = "<span>Thunderstorm</span>. Nature is absolutely losing it.|<span>Lightning</span> and thunder. Dramaqueen.|<span>Storm</span> mode. Unplug your buttplug.|The sky is <span>malfunctioning</span> today. Stay inside.|<span>Thunderstorm</span>. Stay under a tree, it's fun.|Big dick, i mean <span>lightning</span> energy out there. Respect it.|<span>Storm warning</span>. Away from the windows. Now.|Nature is <span>throwing a tantrum</span> and you're in the way.|<span>Thunder and lightning</span>. Very very frightening.|Full <span>weather event</span> today. You didn't ask for this.|<span>Thunderstorm</span>. The sky is having a breakdown.|<span>Lightning</span>. Maybe don't stand near tall things, try." | split: "|" %}
+
+{% else %}
+  {% assign lines = "Weather: <span>unknown</span>. Good luck out there.|Something's <span>happening outside</span>. Unclear what.|<span>Forecast inconclusive</span>. Dress in layers.|The sky is doing <span>something</span>. Proceed with caution.|<span>Unknown conditions</span>. Pack everything.|<span>Weather data unavailable</span>. Trust your gut.|Can't read the <span>sky</span> today. Neither can the app.|<span>Meteorological mystery</span>. Your call.|Wear layers. Bring an umbrella. <span>Hope for the best</span>.|Outside: <span>unclear</span>. Vibes: uncertain." | split: "|" %}
+{% endif %}
+
+{% assign mood_line = lines | sample %}
+{% assign mood_line = mood_line | replace: "<span>", "<span class='text--white text-stroke text-stroke--black'>" %}
+
+{% assign rain_lines = "Oh shit, <strong>CHANCE%</strong> chance of rain today.|<strong>CHANCE%</strong> chance of rain. Thats fucked.|Heads up, <strong>CHANCE%</strong> chance of getting soaked.|Rain probability: <strong>CHANCE%</strong>. So yeah, probably.|<strong>CHANCE%</strong> chance of rain. Your shoes won't survive.|<strong>CHANCE%</strong> rain chance. Pack accordingly or regret it.|<strong>CHANCE%</strong> chance of rain. You'll get fucked anyway.|<strong>CHANCE%</strong> chance of something falling on you.|<strong>CHANCE%</strong> is my trust in you, or in the rain that is probably going to fall.|<strong>CHANCE%</strong> chance of rain, that wetter than your..." | split: "|" %}
+{% assign rain_line = rain_lines | sample | replace: "CHANCE", precipitation_chance %}

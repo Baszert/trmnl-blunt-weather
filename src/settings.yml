@@ -4,7 +4,7 @@ no_screen_padding: 'yes'
 dark_mode: 'no'
 static_data: ''
 polling_verb: get
-framework_version: 3.2.0
+framework_version: latest
 serverless_language: ''
 polling_url: https://trmnl-weather-api.vercel.app/api/weather-proxy?type=mood&latitude={{ trmnl.plugin_settings.custom_fields_values.latitude }}&longitude={{ trmnl.plugin_settings.custom_fields_values.longitude }}&temperature_unit={{ trmnl.plugin_settings.custom_fields_values.temperature_unit }}
 polling_headers: ''
